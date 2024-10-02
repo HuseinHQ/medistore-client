@@ -2,11 +2,13 @@
 
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Button } from '@nextui-org/react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useEffect, useState } from 'react';
 
 export default function NavigationBar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
@@ -48,8 +50,8 @@ export default function NavigationBar() {
 
   return (
     <Navbar>
-      <NavbarBrand>
-        <p className="font-bold text-inherit">Medistore</p>
+      <NavbarBrand onClick={() => router.push('/')}>
+        <p className="font-bold text-inherit hover:cursor-pointer">Medistore</p>
       </NavbarBrand>
       <NavbarContent className="sm:flex gap-4" justify="center">
         <NavbarItem isActive={true}>
