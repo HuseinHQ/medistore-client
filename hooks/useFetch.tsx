@@ -1,6 +1,4 @@
-'use client';
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Response } from '../types/common';
 
 interface FetchState<T> {
@@ -9,33 +7,39 @@ interface FetchState<T> {
   error: unknown | null;
 }
 
-const useFetch = <T,>(url?: string, options?: Request): FetchState<T> => {
+const useFetch = <T,>(url?: string, options?: RequestInit): FetchState<T> & { retrigger: () => void } => {
   const [loading, setLoading] = useState<boolean>(true);
   const [data, setData] = useState<Response<T> | null>(null);
   const [error, setError] = useState<unknown>(null);
+  const [trigger, setTrigger] = useState<number>(0);
 
-  useEffect(() => {
+  const fetchData = useCallback(async () => {
     if (!url) return;
 
-    const fetchData = async () => {
-      try {
-        const response = await fetch(url, options);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const result: Response<T> = await response.json();
-        setData(result);
-      } catch (error) {
-        setError(error);
-      } finally {
-        setLoading(false);
+    setLoading(true);
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
-    };
+      const result: Response<T> = await response.json();
+      setData(result);
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  }, [url]);
 
+  useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData, trigger, url]);
 
-  return { loading, data, error };
+  const retrigger = () => {
+    setTrigger((prev) => prev + 1);
+  };
+
+  return { loading, data, error, retrigger };
 };
 
 export default useFetch;

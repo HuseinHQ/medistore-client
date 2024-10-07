@@ -16,23 +16,30 @@ export default function Home() {
   return (
     <>
       <NavigationBar />
-      <main className="mt-10">
-        <div className="container mx-auto gap-2 grid grid-cols-2 sm:grid-cols-4">
+      <main className="my-10 container mx-auto px-12">
+        <div className="gap-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
           {data?.data?.map((item, index) => (
-            <Card shadow="sm" key={index} isPressable onPress={() => router.push('/items/' + item.id)}>
+            <Card
+              className="group"
+              shadow="sm"
+              key={index}
+              isPressable
+              onPress={() => router.push('/items/' + item.id)}
+            >
               <CardBody className="overflow-visible p-0">
                 <Image
-                  shadow="sm"
                   radius="lg"
                   width="100%"
                   alt={item.name}
-                  className="w-full object-cover h-[140px]"
+                  className="w-full object-cover h-[140px] transition-transform duration-300 group-hover:scale-110"
                   src={item.imgUrl}
                 />
               </CardBody>
-              <CardFooter className="text-small justify-between">
-                <b>{item.name}</b>
-                <p className="text-default-500">{item.price}</p>
+              <CardFooter className="text-small">
+                <div>
+                  <p className="text-left">{item.name}</p>
+                  <p className="text-left font-bold">{'Rp' + item.price}</p>
+                </div>
               </CardFooter>
             </Card>
           ))}

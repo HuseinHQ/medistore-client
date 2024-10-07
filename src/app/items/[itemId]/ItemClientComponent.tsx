@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import NavigationBar from '../../../../components/NavigationBar';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -21,8 +22,8 @@ export default function ItemClientComponent({ item }: { item: Item }) {
 
   const handleAddToCart = async () => {
     if (!localStorage.access_token) {
-      toast.error('Please login to add items to cart');
-      router.push('/login');
+      toast.error('Silakan login terlebih dahulu!');
+      return router.push('/login');
     }
 
     try {
@@ -32,8 +33,11 @@ export default function ItemClientComponent({ item }: { item: Item }) {
         body: JSON.stringify({ quantity: count }),
       });
 
-      toast.success('Item added to cart');
-    } catch (error) {}
+      toast.success((response as any).message ?? 'Barang berhasil ditambahkan');
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.message ?? 'Error add to cart');
+    }
   };
 
   const handleIncreaseCount = () => setCount(count + 1);
@@ -46,8 +50,8 @@ export default function ItemClientComponent({ item }: { item: Item }) {
   return (
     <>
       <NavigationBar />
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+      <main className="container mx-auto px-12 py-8 flex gap-10 h-screen items-start">
+        {/* <div className="bg-white shadow-lg rounded-lg overflow-hidden">
           <div className="md:flex">
             <div className="md:flex-shrink-0">
               <img src={item.imgUrl} alt={item.name} className="h-48 w-full object-cover md:h-full md:w-48" />
@@ -77,8 +81,44 @@ export default function ItemClientComponent({ item }: { item: Item }) {
               </div>
             </div>
           </div>
+        </div> */}
+
+        {/* BARU */}
+        <div>
+          <img src={item.imgUrl} alt={item.name} className="rounded-md w-[240px] xl:w-[348px]" />
         </div>
-      </div>
+
+        <div className="flex-1">
+          <h1 className="font-bold text-xl">{item.name}</h1>
+          <h2 className="mt-2 font-bold text-3xl">{'Rp' + item.price}</h2>
+          <div className="mt-5">
+            <p className="text-primary font-semibold">Detail</p>
+            <p>{item.description}</p>
+          </div>
+        </div>
+
+        <div className="w-1/5 p-3 rounded-md border flex flex-col items-start">
+          <p className="font-bold">Atur Jumlah</p>
+
+          <div className="my-5 flex gap-2 border rounded-md px-1 py-1">
+            <button
+              disabled={count <= 1}
+              className={`${count <= 1 ? 'hover:cursor-not-allowed' : 'hover:bg-slate-100'} px-2 rounded`}
+              onClick={handleDecreaseCount}
+            >
+              -
+            </button>
+            <p className="px-1">{count}</p>
+            <button className="hover:bg-slate-100 px-2 rounded" onClick={handleIncreaseCount}>
+              +
+            </button>
+          </div>
+
+          <button className="w-full bg-primary py-1 text-white rounded-md" onClick={handleAddToCart}>
+            + Keranjang
+          </button>
+        </div>
+      </main>
     </>
   );
 }
