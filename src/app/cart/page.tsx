@@ -11,7 +11,6 @@ import getTotalPrice from '../../../helpers/getTotalPrice';
 import getTotalQuantity from '../../../helpers/getTotalQuantity';
 import numberFormat from '../../../helpers/numberFormat';
 import { useRouter } from 'next/navigation';
-import { Spinner } from '@nextui-org/react';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -22,7 +21,8 @@ export default function Page() {
   });
 
   if (error) {
-    toast.error((error as any).message ?? 'Error fetch carts');
+    // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'error' implicitly has an 'any' type.
+    toast.error(error.message ?? 'Error fetch carts');
   }
 
   const handleIncreaseQuantity = async (id: number) => {
@@ -38,7 +38,8 @@ export default function Page() {
       }
 
       retrigger();
-    } catch (error: any) {
+    } catch (error) {
+      // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'error' implicitly has an 'any' type.
       toast.error(error.message ?? 'Error add quantity');
     }
   };
@@ -56,7 +57,8 @@ export default function Page() {
       }
 
       retrigger();
-    } catch (error: any) {
+    } catch (error) {
+      // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'error' implicitly has an 'any' type.
       toast.error(error.message ?? 'Error decrease quantity');
     }
   };
@@ -75,7 +77,8 @@ export default function Page() {
 
       toast.success('1 produk telah dihapus');
       retrigger();
-    } catch (error: any) {
+    } catch (error) {
+      // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'error' implicitly has an 'any' type.
       toast.error(error.message ?? 'Error delete cart');
     }
   };
@@ -97,7 +100,8 @@ export default function Page() {
       router.push(responseBody.data.snapUrl);
 
       retrigger();
-    } catch (error: any) {
+    } catch (error) {
+      // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'error' implicitly has an 'any' type.
       toast.error(error.message ?? 'Error checkout');
     }
   };

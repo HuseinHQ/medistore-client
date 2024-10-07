@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import NavigationBar from '../../../../components/NavigationBar';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import Image from 'next/image';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -33,9 +32,11 @@ export default function ItemClientComponent({ item }: { item: Item }) {
         body: JSON.stringify({ quantity: count }),
       });
 
-      toast.success((response as any).message ?? 'Barang berhasil ditambahkan');
-    } catch (error: any) {
+      // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'error' implicitly has an 'any' type.
+      toast.success(response.message ?? 'Barang berhasil ditambahkan');
+    } catch (error) {
       console.log(error);
+      // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'error' implicitly has an 'any' type.
       toast.error(error.message ?? 'Error add to cart');
     }
   };

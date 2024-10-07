@@ -30,9 +30,10 @@ export default function Register() {
         throw { errors: result.data, message: result.message };
       }
 
-      const result = await response.json();
+      // const result = await response.json();
       router.push('/login');
-    } catch (error: any) {
+    } catch (error) {
+      // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'error' implicitly has an 'any' type.
       toast.error(error.message ?? 'Error');
     }
   };

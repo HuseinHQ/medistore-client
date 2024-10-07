@@ -28,7 +28,7 @@ export default function Page() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentStatus = searchParams.get('status') || 'all';
-  const { data, loading, error, retrigger } = useFetch<Transaction>(apiUrl + `transactions?status=${currentStatus}`, {
+  const { data, loading, error } = useFetch<Transaction>(apiUrl + `transactions?status=${currentStatus}`, {
     headers: { Authorization: 'Bearer ' + localStorage.access_token },
   });
 
@@ -52,7 +52,8 @@ export default function Page() {
 
   if (error) {
     console.log(error);
-    toast.error((error as any).message ?? 'Error fetch transactions');
+    // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'error' implicitly has an 'any' type.
+    toast.error(error.message ?? 'Error fetch transactions');
   }
 
   const handleStatusChange = (value: string) => {
