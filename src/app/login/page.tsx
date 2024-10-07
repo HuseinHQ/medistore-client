@@ -4,6 +4,7 @@ import React, { FormEvent } from 'react';
 import { Card, CardHeader, CardBody, CardFooter, Input, Button } from '@nextui-org/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -30,14 +31,14 @@ export default function Login() {
 
       const result = await response.json();
       localStorage.setItem('access_token', result.data.access_token);
-      alert(result.message);
+      toast.success(result.message);
       router.push('/');
     } catch (error) {
       console.log(error);
       if (error instanceof Error) {
-        alert(error.message);
+        toast.error(error.message ?? 'Error');
       } else {
-        alert('An error occurred');
+        toast.error('An error occurred');
       }
     }
   };

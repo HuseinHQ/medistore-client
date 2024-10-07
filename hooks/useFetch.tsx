@@ -33,7 +33,7 @@ const useFetch = <T,>(url?: string, options?: Request): FetchState<T> => {
     };
 
     fetchData();
-  }, [url, options]);
+  }, []);
 
   return { loading, data, error };
 };

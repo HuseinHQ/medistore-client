@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import NavigationBar from '../../../../components/NavigationBar';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -20,7 +21,7 @@ export default function ItemClientComponent({ item }: { item: Item }) {
 
   const handleAddToCart = async () => {
     if (!localStorage.access_token) {
-      alert('Please login to add items to cart');
+      toast.error('Please login to add items to cart');
       router.push('/login');
     }
 
@@ -30,6 +31,8 @@ export default function ItemClientComponent({ item }: { item: Item }) {
         headers: { Authorization: 'Bearer ' + localStorage.access_token, 'Content-Type': 'application/json' },
         body: JSON.stringify({ quantity: count }),
       });
+
+      toast.success('Item added to cart');
     } catch (error) {}
   };
 
@@ -53,7 +56,7 @@ export default function ItemClientComponent({ item }: { item: Item }) {
               <h1 className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
                 {item.name}
               </h1>
-              <p className="mt-2 text-3xl text-gray-500">${item.price.toFixed(2)}</p>
+              <p className="mt-2 text-3xl text-gray-500">Rp {item.price}</p>
               <p className="mt-4 text-lg text-gray-500">{item.description}</p>
 
               <div className="flex items-center gap-2 rounded">
