@@ -1,9 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import NavigationBar from '../../../components/NavigationBar';
-import useFetch from '../../../hooks/useFetch';
 import { Transaction } from './types';
 import { HiOutlineShoppingBag } from 'react-icons/hi2';
 import moment from 'moment';
@@ -28,9 +27,35 @@ export default function Page() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentStatus = searchParams.get('status') || 'all';
-  const { data, loading, error } = useFetch<Transaction>(apiUrl + `transactions?status=${currentStatus}`, {
-    headers: { Authorization: 'Bearer ' + localStorage.access_token },
-  });
+  const [data, setData] = useState<Transaction[]>([]);
+  const [loading, seLoading] = useState(false);
+
+  const fetchData = async () => {
+    try {
+      seLoading(true);
+      const response = await fetch(apiUrl + `transactions?status=${currentStatus}`, {
+        headers: { Authorization: 'Bearer ' + localStorage.access_token },
+      });
+
+      if (!response.ok) {
+        const responseBody = await response.json();
+        throw responseBody;
+      }
+
+      const result = await response.json();
+      setData(result.data);
+    } catch (error) {
+      console.log(error);
+      // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'error' implicitly has an 'any' type.
+      toast.error(error.message ?? 'Error fetch transactions');
+    } finally {
+      seLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [currentStatus]);
 
   const handleInvoice = async (id: number) => {
     try {
@@ -47,14 +72,10 @@ export default function Page() {
       router.push(apiUrl + result.data.pdfPath);
     } catch (error) {
       console.log(error);
+      // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'error' implicitly has an 'any' type.
+      toast.error(error.message ?? 'Error generate invoice');
     }
   };
-
-  if (error) {
-    console.log(error);
-    // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'error' implicitly has an 'any' type.
-    toast.error(error.message ?? 'Error fetch transactions');
-  }
 
   const handleStatusChange = (value: string) => {
     router.push(pathname + '?status=' + value);
@@ -69,23 +90,35 @@ export default function Page() {
           <div className="flex items-center gap-4">
             <p className="font-semibold">Status</p>
             {status.map((item, index) => (
-              <button
+              <Suspense
                 key={index}
-                className={`border px-3 py-1 rounded-md ${
-                  currentStatus === item.value
-                    ? 'border-primary text-primary bg-primary-50'
-                    : 'border-gray-300 text-gray-700 bg-white'
-                }`}
-                onClick={() => handleStatusChange(item.value)}
+                fallback={
+                  <button
+                    key={index}
+                    className={`border px-3 py-1 rounded-md border-gray-300 text-gray-700 bg-white`}
+                    onClick={() => handleStatusChange(item.value)}
+                  >
+                    {item.label}
+                  </button>
+                }
               >
-                {item.label}
-              </button>
+                <button
+                  className={`border px-3 py-1 rounded-md ${
+                    currentStatus === item.value
+                      ? 'border-primary text-primary bg-primary-50'
+                      : 'border-gray-300 text-gray-700 bg-white'
+                  }`}
+                  onClick={() => handleStatusChange(item.value)}
+                >
+                  {item.label}
+                </button>
+              </Suspense>
             ))}
           </div>
 
           <div className="flex flex-col gap-2 mt-5">
             {loading && <Spinner />}
-            {data?.data.map((transaction) => (
+            {data.map((transaction) => (
               <div key={transaction.id} className="rounded-lg shadow p-4">
                 <div className="flex items-center gap-3">
                   <HiOutlineShoppingBag className="text-primary" />
@@ -157,7 +190,7 @@ export default function Page() {
                 </div>
               </div>
             ))}
-            {data?.data.length === 0 && !loading && (
+            {data.length === 0 && !loading && (
               <div className="flex items-center justify-center h-full">
                 <p className="text-lg">Tidak ada transaksi</p>
               </div>

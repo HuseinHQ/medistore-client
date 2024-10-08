@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import useFetch from '../../../hooks/useFetch';
 import { CartItem } from './style';
@@ -16,8 +16,16 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Page() {
   const router = useRouter();
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setAccessToken(localStorage.getItem('access_token'));
+    }
+  }, []);
+
   const { data, loading, error, retrigger } = useFetch<CartItem>(apiUrl + 'carts', {
-    headers: { Authorization: 'Bearer ' + localStorage.access_token },
+    headers: { Authorization: 'Bearer ' + accessToken },
   });
 
   if (error) {

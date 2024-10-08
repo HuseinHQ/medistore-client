@@ -3,6 +3,7 @@ import localFont from 'next/font/local';
 import './globals.css';
 import { NextUIProvider } from '@nextui-org/react';
 import { Toaster } from 'react-hot-toast';
+import { Suspense } from 'react';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -33,7 +34,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <NextUIProvider>
           <Toaster />
-          {children}
+          <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
         </NextUIProvider>
       </body>
     </html>
